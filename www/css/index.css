@@ -14,3 +14,7 @@
     top: 25%;
     left: 25%;
 }
+/** http://angular-ui.github.io/bootstrap/#/getting_started CSS section
+ Resolve conflict between angular and bootstrap with empty href (different interpretation)
+ **/
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }

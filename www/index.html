@@ -1,116 +1,35 @@
 <!DOCTYPE HTML>
-<html>
+<html >
 <head>
     <meta name="viewport" content="user-scalable=no,
 initial-scale=1, maximum-scale=1,
 minimum-scale=1, width=device-width;" />
     <title>Audio Recorder</title>
+
+
+    <link type="text/css" href="css/bootstrap.css" rel="stylesheet" />
+
     <link rel="stylesheet" href="css/index.css" />
-    <link type="text/css"
-          href="jquery/css/eggplant/jquery-ui-1.9.2.custom.min.css"
-          rel="stylesheet" />
-    <script type="text/javascript"
-            src="jquery/jquery-1.8.3.min.js"></script>
-    <script type="text/javascript"
-            src="jquery/jquery-ui-1.9.2.custom.min.js"></script>
 
-    <script type="text/javascript"
-            src="cordova.js"></script>
-    <script type="text/javascript">
 
-        var maxTime = 10,
-            countdownInt = 3,
-            src,
-            audioRecording,
-            stopRecording;
-
-        document.addEventListener("deviceready", onDeviceReady, false);
-
-        function onRequestFileSystemSuccess(fileSystem) {
-            var entry=fileSystem.root;
-            entry.getDirectory("touba_voice/", {create: true, exclusive: false}, onGetDirectorySuccess, onGetDirectoryFail);
-        }
-
-        function onGetDirectorySuccess(dir) {
-            alert(dir.fullPath +" is created.");
-            console.log("Created dir "+ dir.name);
-        }
-
-        function onGetDirectoryFail(error) {
-            alert("Error creating directory" + error.code);
-            console.log("Error creating directory "+error.code);
-        }
-
-        function onDeviceReady() {
-            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onRequestFileSystemSuccess, null);
-            recordPrepare();
-        }
-
-        function recordPrepare() {
-            $('#record').unbind();
-            $('#record').html('Start recording');
-            $('#record').bind('touchstart', function() {
-                recordAudio();
-            });
-        }
-
-        function recordAudio() {
-            $('#record').unbind();
-            $('#record').html('Stop recording');
-            $('#record').bind('touchstart', function() {
-                stopRecording();
-            });
-            src = 'touba_voice/recording_' + Math.round(new Date().getTime()/1000) + '.mp3';
-            audioRecording = new Media(src, onSuccess, onError);
-            var startCountdown = setInterval(function() {
-                $('#message').html('Recording will start in ' +
-                        countdownInt + ' seconds...');
-                countdownInt = countdownInt -1;
-                if(countdownInt <= 0) {
-                    countdownInt = 3;
-                    clearInterval(startCountdown);
-                    audioRecording.startRecord();
-                    var recTime = 0;
-                    recInterval = setInterval(function() {
-                        recTime = recTime + 1;
-                        $('#message').html(Math.round(maxTime - recTime) +
-                                ' seconds remaining...');
-                        var progPerc = 100-((100/maxTime) * recTime);
-                        setProgress(progPerc);
-                        if (recTime >= maxTime) {
-                            stopRecording();
-                        }
-                    }, 1000);
-                }
-            }, 1000);
-        }
-
-        function setProgress(progress) {
-            $("#progressbar").progressbar({
-                value: progress
-            });
-        }
-
-        function stopRecording() {
-            clearInterval(recInterval);
-            audioRecording.stopRecord();
-            setProgress(0);
-            recordPrepare();
-        }
-
-        function onSuccess() {
-            $('#message').html('Audio file successfully created:<br />' + src);
-        }
-
-        function onError(error) {
-            $('#message').html('code: ' + error.code + 'message: ' + error.message + '\n');
-        }
-
-    </script>
 </head>
-<body>
+<body ng-app="toubaApp">
     <div id="progressbar"></div>
     <div id="message"></div>
     <button id="record"></button>
+
+    <div ng-controller="AlertDemoCtrl">
+        <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+        <button class='btn btn-default' ng-click="addAlert()">Add Alert</button>
+    </div>
+
+    <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+    <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+
+    <!--script type="text/javascript" src="cordova.js"></script-->
+    <!--script type="text/javascript" src="js/phonegap-main.js"></script-->
+    <script type="text/javascript" src="js/main.js"></script>
+
 </body>
 </html>
