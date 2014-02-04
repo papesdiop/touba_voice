@@ -18,3 +18,24 @@
  Resolve conflict between angular and bootstrap with empty href (different interpretation)
  **/
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+/**App Theming**/
+
+.logo{
+    width: 108px;
+    top: 1px;
+}
+
+.navbar-inverse {
+    background-color: #2A4B0B;
+    border-color: #1A440A;
+}
+
+.jumbotron {
+    padding-bottom: 1px;
+}
+
+.signinlabel{
+    background-color: #2A4B0B;
+    color: #ffffff;
+}

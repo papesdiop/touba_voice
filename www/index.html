@@ -1,35 +1,93 @@
 <!DOCTYPE HTML>
 <html >
 <head>
-    <meta name="viewport" content="user-scalable=no,
-initial-scale=1, maximum-scale=1,
-minimum-scale=1, width=device-width;" />
-    <title>Audio Recorder</title>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no;" />
+    <title>Touba Voice</title>
 
 
-    <link type="text/css" href="css/bootstrap.css" rel="stylesheet" />
+    <link type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="css/index.css" />
 
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
 </head>
-<body ng-app="toubaApp">
-    <div id="progressbar"></div>
-    <div id="message"></div>
-    <button id="record"></button>
 
-    <div ng-controller="AlertDemoCtrl">
-        <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
-        <button class='btn btn-default' ng-click="addAlert()">Add Alert</button>
+<body ng-app="toubaApp">
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#"><img src="img/logo.png" class="logo" alt="Touba voice" width=""></a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#signin">Sigin</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
+    <div class="jumbotron">
+        <div class="container">
+            <img src="img/home.jpg" style="width: 100%">
+            <div class="container signinlabel">
+                <label style="font-size: 60px;text-align: center">Singin in Below</label>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="content" style="background-color: #ffffff">
+        <div class="row">
+            <div class="span4">
+            </div>
+            <div class="span4">
+                <form class="form-signin" role="form">
+                    <h2 class="form-signin-heading">Enter Your Login Information</h2>
+                    <input type="email" class="form-control" placeholder="Email address" required autofocus>
+                    <input type="password" class="form-control" placeholder="Password" required>
+                    <label class="checkbox">
+                        <input type="checkbox" value="remember-me"> Remember me
+                    </label>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                    <button type="button" class="btn btn-default btn-lg">
+                        <span class="glyphicon glyphicon-star"></span> Star
+                    </button>
+                </form>
+            </div>
+            <div class="span4">
+            </div>
+        </div>
+
+        <div ng-controller="TabsCtrl" width="100%">
+            <tabset >
+                <tab ng-repeat="tab in tabs" heading="{{tab.title}}"  style="width:50%" active="tab.active" disabled="tab.disabled">
+                    {{tab.content}}
+                </tab>
+            </tabset>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="bower_components/jquery/jquery.js"></script>
 
     <script type="text/javascript" src="bower_components/angular/angular.js"></script>
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
 
     <!--script type="text/javascript" src="cordova.js"></script-->
-    <!--script type="text/javascript" src="js/phonegap-main.js"></script-->
-    <script type="text/javascript" src="js/main.js"></script>
+    <!--script type="text/javascript" src="js/phonegap.js"></script-->
+    <script type="text/javascript" src="js/controller.js"></script>
 
 </body>
 </html>
