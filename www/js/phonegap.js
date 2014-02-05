@@ -34,13 +34,13 @@ function recordPrepare() {
     });
 }
 
-function recordAudio() {
+function recordAudio(fileName) {
     $('#record').unbind();
     $('#record').html('Stop recording');
     $('#record').bind('touchstart', function() {
         stopRecording();
     });
-    src = 'touba_voice/recording_' + Math.round(new Date().getTime()/1000) + '.mp3';
+    src = fileName==null||fileName === 'undefined' ? 'touba_voice/recording_' + Math.round(new Date().getTime()/1000) + '.mp3': fileName;
     audioRecording = new Media(src, onSuccess, onError);
     var startCountdown = setInterval(function() {
         $('#message').html('Recording will start in ' + countdownInt + ' seconds...');
@@ -65,9 +65,10 @@ function recordAudio() {
 }
 
 function setProgress(progress) {
-    $("#progressbar").progressbar({
+    /*$("#progressbar").progressbar({
         value: progress
-    });
+    });*/
+   console.log( $("#progressbar").html())
 }
 
 function stopRecording() {
