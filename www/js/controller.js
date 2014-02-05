@@ -19,7 +19,8 @@ var maxTime = 10, // Max time for record in seconde
     //countdownInt = 3,
     src,
     audioRecording,
-    stopRecording;
+    stopRecording,
+    recInterval;
 
 document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -47,7 +48,6 @@ toubaApp
     .controller('RecordCtrl', function($scope, Data){
         $scope.data = Data;
         $scope.max = 100;
-        Data.progress= 2;
         var recordPrepare = $scope.recordPrepare = function () {
             $('#record').unbind();
             $('#record').html('Start recording');
@@ -56,7 +56,7 @@ toubaApp
             });
         };
 
-        var recordAudio = function(scope, Data) {
+        var recordAudio =  function($scope, Data) {
             $('#record').unbind();
             $('#record').html('Stop recording');
             $('#record').bind('touchstart', function() {
@@ -72,13 +72,14 @@ toubaApp
                     Data.countdownInt = 3;
                     clearInterval(startCountdown);
                     audioRecording.startRecord();
-                    var recTime = 0,
+                    var recTime = 0;
                     recInterval = setInterval(function() {
                         recTime = recTime + 1;
                         $('#message').html(Math.round(maxTime - recTime) + ' seconds remaining...');
-                        Data.progress = 100-((100/maxTime) * recTime);
-                        console.log('TOUBA VOICE :    ' + Data.progress)
-                        $('#progressbar').html(100-((100/maxTime) * recTime));
+                        var prog = 100-((100/maxTime) * recTime);
+                        $( "#progressbar" ).progressbar({
+                            value: prog
+                        });
                         if (recTime >= maxTime) {
                             clearInterval(recInterval);
                             stopRecording();
@@ -89,9 +90,12 @@ toubaApp
         }
 
         function stopRecording() {
-            //clearInterval(recInterval);
+            clearInterval(recInterval);
             audioRecording.stopRecord();
             recordPrepare();
+            $( "#progressbar" ).progressbar({
+                value: 0
+            });
         }
 
         function onSuccess() {
