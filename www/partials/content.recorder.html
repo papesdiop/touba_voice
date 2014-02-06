@@ -1,0 +1,9 @@
+<div ng-controller="RecordCtrl" class="container-fluid">
+    {{recordPrepare()}}
+    <input type="text" ng-model="data.fileName" />
+    {{data.fileName}}
+    <!--progressbar class="progress-striped active" max="max" value="data.progress"><i>{{data.progress}}/{{max}}</i></progressbar-->
+    <div id="progressbar"></div>
+    <div id="message"></div>
+    <button id="record"></button>
+</div>

@@ -1,7 +1,39 @@
 /**
  * Created by papesdiop on 2/3/14.
  */
-var toubaApp = angular.module('toubaApp', ['ui.bootstrap']);
+var toubaApp = angular.module('toubaApp', ['ui.bootstrap','ui.router']);
+
+toubaApp.config(function($stateProvider, $urlRouterProvider) {
+    //
+    // For any unmatched url, redirect to /state1
+    $urlRouterProvider.otherwise("/signin");
+    //
+    // Now set up the states
+    $stateProvider
+        .state('signin', {
+            url: "/signin",
+            templateUrl: "partials/signin.html"
+        })
+        .state('content', {
+            url: "/content",
+            templateUrl: "partials/content.html"
+        })
+        .state('content.recorder', {
+            url: "/recorder",
+            templateUrl: "partials/content.recorder.html"
+        })
+        .state('player', {
+            url: "/player",
+            templateUrl: "partials/player.html"
+        })
+        .state('player.list', {
+            url: "/list",
+            templateUrl: "partials/player.list.html",
+            controller: function($scope) {
+                $scope.things = ["A", "Set", "Of", "Things"];
+            }
+        })
+});
 
 toubaApp.factory('Data', function(){
     return {
@@ -72,15 +104,18 @@ toubaApp
                     Data.countdownInt = 3;
                     clearInterval(startCountdown);
                     audioRecording.startRecord();
-                    var recTime = 0;
+                    var recTime = maxTime;
                     recInterval = setInterval(function() {
-                        recTime = recTime + 1;
+                        recTime = recTime - 1;
                         $('#message').html(Math.round(maxTime - recTime) + ' seconds remaining...');
                         var prog = 100-((100/maxTime) * recTime);
                         $( "#progressbar" ).progressbar({
                             value: prog
                         });
-                        if (recTime >= maxTime) {
+                        $( "#progressbar" ).on( "progressbarcomplete", function( event, ui ) {
+
+                        } );
+                        if (recTime <= 0) {
                             clearInterval(recInterval);
                             stopRecording();
                         }
@@ -93,9 +128,7 @@ toubaApp
             clearInterval(recInterval);
             audioRecording.stopRecord();
             recordPrepare();
-            $( "#progressbar" ).progressbar({
-                value: 0
-            });
+            $( "#progressbar" ).progressbar( "destroy" )
         }
 
         function onSuccess() {
