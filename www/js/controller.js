@@ -22,15 +22,11 @@ toubaApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/recorder",
             templateUrl: "partials/content.recorder.html"
         })
-        .state('player', {
+        .state('content.player', {
             url: "/player",
-            templateUrl: "partials/player.html"
-        })
-        .state('player.list', {
-            url: "/list",
-            templateUrl: "partials/player.list.html",
+            templateUrl: "partials/content.player.html",
             controller: function($scope) {
-                $scope.things = ["A", "Set", "Of", "Things"];
+                $scope.records = ["AKASSA", "KARA", "MESSAGE DU CHEIKH", "AJABANI"];
             }
         })
 });
@@ -38,6 +34,7 @@ toubaApp.config(function($stateProvider, $urlRouterProvider) {
 toubaApp.factory('Data', function(){
     return {
         fileName: 'My Recording',
+        ext: '.mp3', //file extension .mp3, .wav
         maxTime : 10, // Max time for record in seconde
         countdownInt : 3,
         src:null,
@@ -77,15 +74,47 @@ function onDeviceReady($scope, Data) {
 
 
 toubaApp
-    .controller('RecordCtrl', function($scope, Data){
+    .controller('RecordCtrl', function($scope, $modal, $log, Data){
         $scope.data = Data;
         $scope.max = 100;
+
         var recordPrepare = $scope.recordPrepare = function () {
             $('#record').unbind();
             $('#record').html('Start recording');
             $('#record').bind('touchstart', function (){
                 recordAudio($scope, Data)
             });
+        };
+
+        $scope.open = function () {
+
+            var modalInstance = $modal.open({
+                templateUrl: 'fileModal',
+                controller: ModalInstanceCtrl,
+                resolve: {
+                    data: function () {
+                        return $scope.data;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (fileName) {
+                $scope.data.fileName = fileName;
+                $log.info('FileName saved as: ' + fileName);
+            }, function () {
+                $log.info('Modal dismissed at: ' + new Date());
+            });
+        };
+
+        var ModalInstanceCtrl = function ($scope, $modalInstance, data) {
+            $scope.data = data
+            $scope.ok = function () {
+                $modalInstance.close($scope.data.fileName);
+            };
+
+            $scope.cancel = function () {
+                $modalInstance.dismiss('cancel');
+            };
         };
 
         var recordAudio =  function($scope, Data) {
@@ -95,7 +124,8 @@ toubaApp
                 stopRecording();
             });
             src = 'touba_voice/'
-            src = src + ((Data.fileName==null||Data.fileName === 'undefined') ? 'recording_' + Math.round(new Date().getTime()/1000) + '.mp3': Data.fileName +'.mp3');
+            src = src + ((Data.fileName==null||Data.fileName === 'undefined') ? 'recording_' + Math.round(new Date().getTime()/1000) : Data.fileName);
+            src += Data.ext;
             audioRecording = new Media(src, onSuccess, onError);
             var startCountdown = setInterval(function() {
                 $('#message').html('Recording will start in ' + Data.countdownInt + ' seconds...');
@@ -128,7 +158,8 @@ toubaApp
             clearInterval(recInterval);
             audioRecording.stopRecord();
             recordPrepare();
-            $( "#progressbar" ).progressbar( "destroy" )
+            $("#progressbar" ).progressbar( "destroy" );
+            $("#progressbar").append("<a class='btn btn-primary btn-lg glyphicon glyphicon-saved' >DONE</a>");
         }
 
         function onSuccess() {
