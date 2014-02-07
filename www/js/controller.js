@@ -79,6 +79,7 @@ toubaApp
         $scope.max = 100;
 
         var recordPrepare = $scope.recordPrepare = function () {
+            $('#prepareRecord').attr("disabled", false);
             $('#record').unbind();
             $('#record').html('Start recording');
             $('#record').bind('touchstart', function (){
@@ -118,9 +119,10 @@ toubaApp
         };
 
         var recordAudio =  function($scope, Data) {
+            $('#prepareRecord').attr("disabled", true);
             $('#record').unbind();
             $('#record').html('Stop recording');
-            $('#record').bind('touchstart', function() {
+            $('#stop').bind('touchstart', function() {
                 stopRecording();
             });
             src = 'touba_voice/'
@@ -137,7 +139,9 @@ toubaApp
                     var recTime = maxTime;
                     recInterval = setInterval(function() {
                         recTime = recTime - 1;
-                        $('#message').html(Math.round(maxTime - recTime) + ' seconds remaining...');
+                        //$('#message').html(recTime + ' seconds remaining...');
+                        var timeRun = maxTime - recTime
+                        $('#message').html(Math.floor(timeRun/60) +':' + timeRun%60);
                         var prog = 100-((100/maxTime) * recTime);
                         $( "#progressbar" ).progressbar({
                             value: prog
@@ -159,7 +163,7 @@ toubaApp
             audioRecording.stopRecord();
             recordPrepare();
             $("#progressbar" ).progressbar( "destroy" );
-            $("#progressbar").append("<a class='btn btn-primary btn-lg glyphicon glyphicon-saved' >DONE</a>");
+           // $("#progressbar").append("<a class='btn btn-primary btn-lg glyphicon glyphicon-saved' >DONE</a>");
         }
 
         function onSuccess() {
