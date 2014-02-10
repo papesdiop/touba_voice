@@ -2,4 +2,11 @@
 <ul>
     <li ng-repeat="item in records">{{ item }}</li>
 </ul>
+
+<div ng-controller="PlayerCtrl" class="container-fluid">
+    <a class="btn btn-primary btn-lg" id="player">LIST</a>
+    <ul id="directoryList" data-role="listview" data-inset="true">
+    </ul>
+</div>
+
 <div ui-view></div>
