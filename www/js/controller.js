@@ -73,13 +73,12 @@ function success(entries) {
     var i;
     var objectType;
     for (i=0; i<entries.length; i++) {
-        if(entries[i].isDirectory == true) {
-            objectType = 'Directory';
-        } else {
-            objectType = 'File';
+        if(entries[i].name.contains(recordsDirectory)){
+
+
         }
         $('#directoryList').append('<li><h3>' + entries[i].name +
-            '</h3><p>' + entries[i].toURI() + '</p><p class="ui-li-aside">Type:<strong>' + objectType + '</strong></p></li>');
+            '</h3><p>' + entries[i].toURI() + '</p><p class="ui-li-aside">Type:<strong>' + entries[i].name + '</strong></p></li>');
     }
     $('#directoryList').listview("refresh");
 }
@@ -159,7 +158,7 @@ toubaApp
                 stopRecording();
             });
 
-            audioRecording = new Media(src, onSuccess, onError);
+            audioRecording = new Media(src, onSuccess(src), onError);
             var startCountdown = setInterval(function() {
                 $('#message').html('Recording will start in ' + Data.countdownInt + ' seconds...');
                 Data.countdownInt = Data.countdownInt -1;
@@ -196,7 +195,7 @@ toubaApp
             //$("#recordDone").unbind()
         }
 
-        function uploadRecord(){
+        function onSuccess(recordURI){
             $("#message").html("<p>Uploading record</p>");
             var options = new FileUploadOptions();
             options.fileKey = "file";
@@ -205,21 +204,18 @@ toubaApp
             options.chunkedMode = false;
             var fileTransfer = new FileTransfer();
             fileTransfer.upload(
-                src,
+                recordURI,
                 "http://localhost:3000/records", // Remote server for uploading record
                 fileUploaded,
                 onError,
                 options
             );
+            $('#message').html('Audio file successfully created:<br />' + recordURI);
         }
 
         function fileUploaded(result) {
             $("#message").html('<p>Upload complete!!<br />Bytes sent: ' + result.bytesSent + '</p>');
             //$("#returnMessage").attr("src", result.response);
-        }
-
-        function onSuccess() {
-            $('#message').html('Audio file successfully created:<br />' + src);
         }
 
         function onError(error) {
