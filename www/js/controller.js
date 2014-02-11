@@ -128,7 +128,7 @@ toubaApp
             src = 'touba_voice/'
             src = src + ((Data.fileName==null||Data.fileName === 'undefined') ? 'recording_' + Math.round(new Date().getTime()/1000) : Data.fileName);
             src += Data.ext;
-            audioRecording = new Media(src, onSuccess, onError);
+            audioRecording = new Media(src, onSuccess(src), onError);
             var startCountdown = setInterval(function() {
                 $('#message').html('Recording will start in ' + Data.countdownInt + ' seconds...');
                 Data.countdownInt = Data.countdownInt -1;
@@ -147,7 +147,7 @@ toubaApp
                             value: prog
                         });
                         $( "#progressbar" ).on( "progressbarcomplete", function( event, ui ) {
-
+                                alert('Max time reached')
                         } );
                         if (recTime <= 0) {
                             clearInterval(recInterval);
@@ -166,8 +166,27 @@ toubaApp
            // $("#progressbar").append("<a class='btn btn-primary btn-lg glyphicon glyphicon-saved' >DONE</a>");
         }
 
-        function onSuccess() {
+        function onSuccess(recordURI) {
+            $("#message").html("<p>Uploading record</p>");
+            var options = new FileUploadOptions();
+            options.fileKey = "file";
+            options.fileName = Data.fileName; //fileLocation.substr(src.lastIndexOf('/')+1);
+            options.mimeType = "audio/mpeg"; //audio/mpeg    audio/x-wav
+            options.chunkedMode = false;
+            var fileTransfer = new FileTransfer();
+            fileTransfer.upload(
+             recordURI,
+             "http://192.168.2.63:3000/records", // Remote server for uploading record
+             fileUploaded,
+             onError,
+             options
+             );
             $('#message').html('Audio file successfully created:<br />' + src);
+        }
+
+        function fileUploaded(result) {
+            $("#message").html('<p>Upload complete!!<br />Bytes sent: ' + result.bytesSent + '</p>');
+            //$("#returnMessage").attr("src", result.response);
         }
 
         function onError(error) {
