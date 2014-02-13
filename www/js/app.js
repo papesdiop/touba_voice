@@ -1,7 +1,7 @@
 /**
  * Created by papesdiop on 2/3/14.
  */
-var toubaApp = angular.module('toubaApp', ['ui.bootstrap','ui.router']);
+var toubaApp = angular.module('toubaApp', ['ui.bootstrap','ui.router','ngResource']);
 
 toubaApp.config(function($stateProvider, $urlRouterProvider) {
     //
@@ -25,9 +25,14 @@ toubaApp.config(function($stateProvider, $urlRouterProvider) {
         .state('content.player', {
             url: "/player",
             templateUrl: "partials/content.player.html",
-            controller: function($scope) {
-                $scope.records = ["AKASSA", "KARA", "MESSAGE DU CHEIKH", "AJABANI"];
-            }
+            controller: 'PlayerCtrl'
+            /*controller: function($scope, Data){
+                $scope.data = Data;
+                $.get('http://localhost:3000/records', function(data, success) {
+                        $scope.records =  data;
+                        console.log(data)
+                    })
+            }*/
         })
 });
 
@@ -49,7 +54,8 @@ var maxTime = 10, // Max time for record in seconde
     src,
     audioRecording,
     stopRecording,
-    recInterval;
+    recInterval,
+    SERVER_ADDRESS = 'http://toubavoiceserver-software.rhcloud.com';
 
 document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -66,14 +72,59 @@ function onRequestFileSystemSuccess(fileSystem) {
     entry.getDirectory("touba_voice/", {create: true, exclusive: false}, onGetDirectorySuccess, onGetDirectoryFail);
 }
 
+function success(entries) {
+    var i;
+     var objectType;
+     for (i=0; i<entries.length; i++) {
+     if(entries[i].name.contains(recordsDirectory)){
+
+
+     }
+     $('#directoryList').append('<li><h3>' + entries[i].name +
+     '</h3><p>' + entries[i].toURI() + '</p><p class="ui-li-aside">Type:<strong>' + entries[i].name + '</strong></p></li>');
+     }
+     $('#directoryList').listview("refresh");
+}
+
 function onDeviceReady($scope, Data) {
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onRequestFileSystemSuccess, null);
 }
 
 /**End**/
 
+toubaApp.factory('RecordRest', ['$resource',
+    function($resource){
+        return $resource(SERVER_ADDRESS+'/records/:id', {Id: "@Id" }, {
+            query: {method:'GET', params:{}, isArray:true}
+        });
+    }]);
 
 toubaApp
+    .controller('PlayerCtrl', function($scope, $resource, Data, RecordRest){
+       // $scope.data = Data;
+       /* $.ajax({
+            'cache':false,
+            'url' : 'http://toubavoiceserver-software.rhcloud.com/records',
+            'type' : 'GET',
+            'dataType': 'json',
+            //'async': true,
+            'success' : function(data) {
+                //console.log(data)
+               // $scope.recordz =  data;
+                alert('ok')
+            },
+            //'crossDomain': true,
+            'error': function(jqXHR, textStatus, errorThrown){
+                alert(textStatus)
+                console.log(jqXHR)
+                console.log(errorThrown)
+            }
+        });*/
+       $scope.records = RecordRest.query() ;
+
+        console.log($scope.records)
+
+    })
     .controller('RecordCtrl', function($scope, $modal, $log, Data){
         $scope.data = Data;
         $scope.max = 100;
@@ -147,7 +198,7 @@ toubaApp
                             value: prog
                         });
                         $( "#progressbar" ).on( "progressbarcomplete", function( event, ui ) {
-                                alert('Max time reached')
+                                //alert('Max time reached')
                         } );
                         if (recTime <= 0) {
                             clearInterval(recInterval);
@@ -176,7 +227,7 @@ toubaApp
             var fileTransfer = new FileTransfer();
             fileTransfer.upload(
              recordURI,
-             "http://192.168.2.63:3000/records", // Remote server for uploading record
+             SERVER_ADDRESS+'/records', // Remote server for uploading record
              fileUploaded,
              onError,
              options

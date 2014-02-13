@@ -1,3 +1,8 @@
+#!/bin/env node
+
+var ipaddr  = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
+var port    = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+
 var express = require('express'),
     http = require('http'),
     path = require('path'),
@@ -18,6 +23,4 @@ app.use(express.static(path.join(__dirname, './uploads')));
 app.post('/records', main.addRecord); // endpoint to post new record
 app.get('/records', main.getRecords); // endpoint to get list of records
 
-app.listen(3000, function () {
-    console.log('Voice Touba server listening on port 3000');
-});
+http.createServer(app).listen(port, ipaddr);
