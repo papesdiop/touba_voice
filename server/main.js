@@ -41,17 +41,23 @@ exports.getRecords = function(req, res, next) {
 exports.addRecord = function(req, res, next) {
 
     console.log("upload");
+    console.log(req.files);
+    console.log('---------------------------');
+    //console.log('PATH :' + req.files.file.path);
 
     var file = req.files.file,
         filePath = file&&file.path||null,
- 	fileName = file&&file.fileName||null,
-        //lastIndex = filePath.lastIndexOf("/"),
-        //tmpFileName = filePath.substr(lastIndex + 1),
+ 	    fileName = file&&file.name||null,
+        lastIndex = filePath.lastIndexOf("/"),
+        tmpFileName = filePath.substr(lastIndex + 1),
         record = req.body,
         records = db.collection('records');
 
-    //record.fileName = tmpFileName;
-    console.log(req.options);
+    record.size = file.size
+    record.name = file.name
+    record.type = file.type
+    record.fileName = tmpFileName
+
 
     records.insert(record, function (err, result) {
         if (err) {

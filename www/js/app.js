@@ -26,31 +26,20 @@ toubaApp.config(function($stateProvider, $urlRouterProvider) {
             url: "/player",
             templateUrl: "partials/content.player.html",
             controller: 'PlayerCtrl'
-            /*controller: function($scope, Data){
-                $scope.data = Data;
-                $.get('http://localhost:3000/records', function(data, success) {
-                        $scope.records =  data;
-                        console.log(data)
-                    })
-            }*/
         })
 });
 
 toubaApp.factory('Data', function(){
     return {
         fileName: 'My Recording',
-        ext: '.mp3', //file extension .mp3, .wav
+        ext: '.wav', //file extension .mp3, .wav
         maxTime : 10, // Max time for record in seconde
-        countdownInt : 3,
-        src:null,
-        audioRecording:null,
-        stopRecording:null,
-        progress:1
+        //countdownInt : 3,
+        src:null
     }
 })
 
 var maxTime = 10, // Max time for record in seconde
-    //countdownInt = 3,
     src,
     audioRecording,
     stopRecording,
@@ -70,6 +59,8 @@ function onGetDirectoryFail(error) {
 function onRequestFileSystemSuccess(fileSystem) {
     var entry=fileSystem.root;
     entry.getDirectory("touba_voice/", {create: true, exclusive: false}, onGetDirectorySuccess, onGetDirectoryFail);
+    //var tmpPath = fileSystem.root.fullPath + "/touba_voice";
+    //window.resolveLocalFileSystemURI(tmpPath, null, fail);
 }
 
 function success(entries) {
@@ -101,25 +92,6 @@ toubaApp.factory('RecordRest', ['$resource',
 
 toubaApp
     .controller('PlayerCtrl', function($scope, $resource, Data, RecordRest){
-       // $scope.data = Data;
-       /* $.ajax({
-            'cache':false,
-            'url' : 'http://toubavoiceserver-software.rhcloud.com/records',
-            'type' : 'GET',
-            'dataType': 'json',
-            //'async': true,
-            'success' : function(data) {
-                //console.log(data)
-               // $scope.recordz =  data;
-                alert('ok')
-            },
-            //'crossDomain': true,
-            'error': function(jqXHR, textStatus, errorThrown){
-                alert(textStatus)
-                console.log(jqXHR)
-                console.log(errorThrown)
-            }
-        });*/
        $scope.records = RecordRest.query() ;
 
         console.log($scope.records)
@@ -152,9 +124,9 @@ toubaApp
 
             modalInstance.result.then(function (fileName) {
                 $scope.data.fileName = fileName;
-                $log.info('FileName saved as: ' + fileName);
+                //$log.info('FileName saved as: ' + fileName);
             }, function () {
-                $log.info('Modal dismissed at: ' + new Date());
+                //$log.info('Modal dismissed at: ' + new Date());
             });
         };
 
@@ -169,17 +141,25 @@ toubaApp
             };
         };
 
+        function stopRecording() {
+            $("#progressbar" ).progressbar( "destroy" );
+            $('#message').html('Audio file successfully created:<br />' + src);
+            clearInterval(recInterval);
+            audioRecording.stopRecord();
+            recordPrepare();
+        }
+
         var recordAudio =  function($scope, Data) {
-            $('#prepareRecord').attr("disabled", true);
+            //$('#prepareRecord').attr("disabled", true);
             $('#record').unbind();
             $('#record').html('Stop recording');
             $('#stop').bind('touchstart', function() {
                 stopRecording();
             });
             src = 'touba_voice/'
-            src = src + ((Data.fileName==null||Data.fileName === 'undefined') ? 'recording_' + Math.round(new Date().getTime()/1000) : Data.fileName);
-            src += Data.ext;
-            audioRecording = new Media(src, onSuccess(src), onError);
+            src += ((Data.fileName==null||Data.fileName === 'undefined') ? 'recording_' + Math.round(new Date().getTime()/1000) : Data.fileName)+Data.ext;
+            audioRecording = new Media(src, onSuccess, onError);
+            Data.countdownInt = 3;
             var startCountdown = setInterval(function() {
                 $('#message').html('Recording will start in ' + Data.countdownInt + ' seconds...');
                 Data.countdownInt = Data.countdownInt -1;
@@ -190,7 +170,6 @@ toubaApp
                     var recTime = maxTime;
                     recInterval = setInterval(function() {
                         recTime = recTime - 1;
-                        //$('#message').html(recTime + ' seconds remaining...');
                         var timeRun = maxTime - recTime
                         $('#message').html(Math.floor(timeRun/60) +':' + timeRun%60);
                         var prog = 100-((100/maxTime) * recTime);
@@ -201,7 +180,6 @@ toubaApp
                                 //alert('Max time reached')
                         } );
                         if (recTime <= 0) {
-                            clearInterval(recInterval);
                             stopRecording();
                         }
                     }, 1000);
@@ -209,30 +187,28 @@ toubaApp
             }, 1000);
         }
 
-        function stopRecording() {
-            clearInterval(recInterval);
-            audioRecording.stopRecord();
-            recordPrepare();
-            $("#progressbar" ).progressbar( "destroy" );
-           // $("#progressbar").append("<a class='btn btn-primary btn-lg glyphicon glyphicon-saved' >DONE</a>");
+        function onSuccess() {
+            $('#message').html('Audio file successfully created:<br />' + src);
+            //send(src); //will be removed
         }
 
-        function onSuccess(recordURI) {
-            $("#message").html("<p>Uploading record</p>");
+        function send(recordURI) {
+            console.log('RECORD URI : ' + recordURI);
+            $("#message").html("<p>Sending "+recordURI+"</p>");
             var options = new FileUploadOptions();
             options.fileKey = "file";
-            options.fileName = Data.fileName; //fileLocation.substr(src.lastIndexOf('/')+1);
-            options.mimeType = "audio/mpeg"; //audio/mpeg    audio/x-wav
+            options.fileName = Data.fileName + Data.ext; //recordURI.substr(src.lastIndexOf('/')+1);
+            options.mimeType = "audio/x-wav"; //audio/mpeg    audio/x-wav
             options.chunkedMode = false;
             var fileTransfer = new FileTransfer();
             fileTransfer.upload(
-             recordURI,
-             SERVER_ADDRESS+'/records', // Remote server for uploading record
-             fileUploaded,
-             onError,
-             options
-             );
-            $('#message').html('Audio file successfully created:<br />' + src);
+                '/sdcard/'+recordURI,
+                SERVER_ADDRESS+'/records', // Remote server for uploading record
+                fileUploaded,
+                onError,
+                options
+            );
+            //$('#message').html('Audio file successfully sent:<br />' + src);
         }
 
         function fileUploaded(result) {
@@ -242,6 +218,7 @@ toubaApp
 
         function onError(error) {
             $('#message').html('code: ' + error.code + 'message: ' + error.message + '\n');
+            console.dir(error)
         }
 
     })
