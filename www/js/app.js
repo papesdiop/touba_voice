@@ -106,11 +106,23 @@ toubaApp
             $('#record').unbind();
             $('#record').html('Start recording');
             $('#record').bind('touchstart', function (){
-                recordAudio($scope, Data)
+                $( "#dialog-modal" ).dialog( "close" );
+                recordAudio($scope, Data);
             });
+            $( "#dialog-modal" ).dialog({
+                autoOpen: false,
+                //height: 300,
+                width: 350,
+                modal: true
+            });
+            $( "#prepareRecord" )
+                .button()
+                .click(function() {
+                    $( "#dialog-modal" ).dialog( "open" );
+                });
         };
 
-        $scope.open = function () {
+        /*$scope.open = function () {
 
             var modalInstance = $modal.open({
                 templateUrl: 'fileModal',
@@ -139,7 +151,7 @@ toubaApp
             $scope.cancel = function () {
                 $modalInstance.dismiss('cancel');
             };
-        };
+        };*/
 
         function stopRecording() {
             $("#progressbar" ).progressbar( "destroy" );

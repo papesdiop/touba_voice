@@ -28,7 +28,7 @@ MongoClient.connect(url, {native_parser: true}, function (err, connection) {
 
 exports.getRecords = function(req, res, next) {
     var records = db.collection('records');
-// retreive last the 10 records
+// retrieve last the 10 records
     records.find().sort({ _id: -1 }).limit(10).toArray(function (err, data) {
         if (err) {
             console.log(err);
