@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html >
+<head>
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, user-scalable=no" />
+    <title>Touba Voice</title>
+
+    <link href="lib/jquery-mobile/jquery.mobile-1.4.1.css" rel="stylesheet"/>
+
+
+    <script type="text/javascript" src="bower_components/jquery/jquery.js"></script>
+    <script type="text/javascript" src="lib/jquery-mobile/jquery.mobile-1.4.1.js"></script>
+
+    <script type="text/javascript" src="bower_components/angular/angular.js"></script>
+    <script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+
+    <!--script src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script-->
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+
+</head>
+
+<body ng-app="toubaApp">
+
+
+<div class="ui-corner-all custom-corners">
+    <div class="ui-bar ui-bar-a">
+        <h3>Touba Voice</h3>
+    </div>
+    <div data-role="navbar" data-iconpos="right">
+        <ul>
+            <li><a href="#" data-icon="home">Home</a></li>
+            <li><a href="#" data-icon="star">Go Play!</a></li>
+            <li><a data-icon="grid" ui-sref="content">About</a></li>
+        </ul>
+    </div>
+    <div ui-view class="ui-body ui-body-a">
+        <p>Content</p>
+    </div>
+</div>
+
+
+
+
+</body>
+</html>

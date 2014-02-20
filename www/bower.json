@@ -14,12 +14,18 @@
     "tests"
   ],
   "dependencies": {
+    "angular": "1.2.0",
     "angular-bootstrap": "~0.10.0",
-    "bootstrap": "~3.1.0",
     "jquery": "~2.1.0",
-    "jquery-ui": "~1.10.3",
     "angular-ui-router": "0.2.8-bowratic-tedium",
-    "jquery-mobile": "~1.4.0",
+    "jquery-mobile-bower": "latest",
     "angular-resource": "~1.2.12"
-  }
+  },
+  "description": "touba application for mourid community",
+  "main": "index.html",
+  "keywords": [
+    "touba",
+    "c4a"
+  ],
+  "private": true
 }

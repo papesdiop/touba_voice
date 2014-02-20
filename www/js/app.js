@@ -1,7 +1,7 @@
 /**
  * Created by papesdiop on 2/3/14.
  */
-var toubaApp = angular.module('toubaApp', ['ui.bootstrap','ui.router','ngResource']);
+var toubaApp = angular.module('toubaApp', [/*'ui.bootstrap',*/'ui.router','ngResource']);
 
 toubaApp.config(function($stateProvider, $urlRouterProvider) {
     //
@@ -32,49 +32,36 @@ toubaApp.config(function($stateProvider, $urlRouterProvider) {
 toubaApp.factory('Data', function(){
     return {
         fileName: 'My Recording',
-        ext: '.wav', //file extension .mp3, .wav
+        ext: '.mp3', //file extension .mp3, .wav
         maxTime : 10, // Max time for record in seconde
         //countdownInt : 3,
         src:null
     }
 })
 
-var maxTime = 10, // Max time for record in seconde
+var maxTime = 1000, // Max time for record in seconde
     src,
     audioRecording,
     stopRecording,
     recInterval,
+    directory,
+    reader,
     SERVER_ADDRESS = 'http://toubavoiceserver-software.rhcloud.com';
 
 document.addEventListener("deviceready", onDeviceReady, false);
 
 /** Records directory creation **/
-function onGetDirectorySuccess(dir) {
-    console.log("Created dir "+ dir.name);
-}
-
-function onGetDirectoryFail(error) {
-    //alert("Error creating directory" + error.code);
-}
 function onRequestFileSystemSuccess(fileSystem) {
     var entry=fileSystem.root;
-    entry.getDirectory("touba_voice/", {create: true, exclusive: false}, onGetDirectorySuccess, onGetDirectoryFail);
-    //var tmpPath = fileSystem.root.fullPath + "/touba_voice";
-    //window.resolveLocalFileSystemURI(tmpPath, null, fail);
-}
-
-function success(entries) {
-    var i;
-     var objectType;
-     for (i=0; i<entries.length; i++) {
-     if(entries[i].name.contains(recordsDirectory)){
-
-
-     }
-     $('#directoryList').append('<li><h3>' + entries[i].name +
-     '</h3><p>' + entries[i].toURI() + '</p><p class="ui-li-aside">Type:<strong>' + entries[i].name + '</strong></p></li>');
-     }
-     $('#directoryList').listview("refresh");
+    entry.getDirectory("touba_voice/", {create: true, exclusive: false},
+        function (dir) {
+            console.log("Created dir "+ dir.name);
+            directory = dir;
+            reader = dir.createReader();
+        }
+        ,function (error) {
+        //alert("Error creating directory" + error.code);
+    });
 }
 
 function onDeviceReady($scope, Data) {
@@ -94,7 +81,125 @@ toubaApp
     .controller('PlayerCtrl', function($scope, $resource, Data, RecordRest){
        $scope.records = RecordRest.query() ;
 
-        console.log($scope.records)
+        if($scope.records===null||$scope.records.length===0){
+        reader.readEntries(
+                function (entries) {
+                    console.log("The dir has "+entries.length+" entries.");
+                    // Scan for audio src
+                    for (var i=0; i<entries.length; i++) {
+                        console.log(entries[i].name+' dir? '+entries[i].isDirectory);
+                        $scope.records.push({'fileName':entries[i].name})
+                        if(entries[i].name == src) {
+                            console.log("file found");
+                        }
+                    }
+                },
+                function (error) {
+                    alert('onError(): '    + error.code    + '\n' +
+                        'message: ' + error.message + '\n');
+                })
+        }
+
+        var audioMedia = null,
+            audioTimer = null,
+            duration = -1,
+            is_paused = false;
+
+        $("#playLocalAudio").bind('touchstart', function() {
+            stopAudio();
+            var srcLocal = '/android_asset/www/434921-1gtndm8.mp3';
+            playAudio(srcLocal);
+        });
+        $("#playRemoteAudio").bind('touchstart', function() {
+            stopAudio();
+            var srcRemote = 'http://toubavoiceserver-software.rhcloud.com/test.mp3';
+            playAudio(srcRemote);
+        });
+        $("#pauseaudio").bind('touchstart', function() {
+            pauseAudio();
+        });
+        $("#stopaudio").bind('touchstart', function() {
+            stopAudio();
+        });
+
+        function playAudio(src) {
+            if (audioMedia === null) {
+                $("#mediaDuration").html("0");
+                $("#audioPosition").html("Loading...");
+                audioMedia = new Media(src, onSuccess, onError);
+                audioMedia.play();
+            } else {
+                if (is_paused) {
+                    is_paused = false;
+                    audioMedia.play();
+                }
+            }
+            if (audioTimer === null) {
+                audioTimer = setInterval(function() {
+                    audioMedia.getCurrentPosition(
+                        function(position) {
+                            if (position > -1) {
+                                setAudioPosition(Math.round(position));
+                                if (duration <= 0) {
+                                    duration = audioMedia.getDuration();
+                                    if (duration > 0) {
+                                        duration = Math.round(duration);
+                                        $("#mediaDuration").html(duration);
+                                    }
+                                }
+                            }
+                        },
+                        function(error) {
+                            console.log("Error getting position=" + error);
+                            setAudioPosition("Error: " + error);
+                        }
+                    );
+                }, 1000);
+            }
+        }
+
+        function pauseAudio() {
+            if (is_paused) return;
+            if (audioMedia) {
+                is_paused = true;
+                audioMedia.pause();
+            }
+        }
+
+        function stopAudio() {
+            if (audioMedia) {
+                audioMedia.stop();
+                audioMedia.release();
+                audioMedia = null;
+            }
+            if (audioTimer) {
+                clearInterval(audioTimer);
+                audioTimer = null;
+            }
+            is_paused = false;
+            duration = 0;
+        }
+
+        function setAudioPosition(position) {
+            $("#audioPosition").html(position + " sec");
+        }
+
+        function onSuccess() {
+            setAudioPosition(duration);
+            clearInterval(audioTimer);
+            audioTimer = null;
+            audioMedia = null;
+            is_paused = false;
+            duration = -1;
+        }
+        function onError(error) {
+            alert('code: ' + error.code + '\n' + 'message: ' + error.source + '\n');
+            clearInterval(audioTimer);
+            audioTimer = null;
+            audioMedia = null;
+            is_paused = false;
+            setAudioPosition("0");
+        }
 
     })
     .controller('RecordCtrl', function($scope, $modal, $log, Data){
@@ -111,7 +216,6 @@ toubaApp
             });
             $( "#dialog-modal" ).dialog({
                 autoOpen: false,
-                //height: 300,
                 width: 350,
                 modal: true
             });
@@ -121,37 +225,6 @@ toubaApp
                     $( "#dialog-modal" ).dialog( "open" );
                 });
         };
-
-        /*$scope.open = function () {
-
-            var modalInstance = $modal.open({
-                templateUrl: 'fileModal',
-                controller: ModalInstanceCtrl,
-                resolve: {
-                    data: function () {
-                        return $scope.data;
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (fileName) {
-                $scope.data.fileName = fileName;
-                //$log.info('FileName saved as: ' + fileName);
-            }, function () {
-                //$log.info('Modal dismissed at: ' + new Date());
-            });
-        };
-
-        var ModalInstanceCtrl = function ($scope, $modalInstance, data) {
-            $scope.data = data
-            $scope.ok = function () {
-                $modalInstance.close($scope.data.fileName);
-            };
-
-            $scope.cancel = function () {
-                $modalInstance.dismiss('cancel');
-            };
-        };*/
 
         function stopRecording() {
             $("#progressbar" ).progressbar( "destroy" );
@@ -184,9 +257,9 @@ toubaApp
                         recTime = recTime - 1;
                         var timeRun = maxTime - recTime
                         $('#message').html(Math.floor(timeRun/60) +':' + timeRun%60);
-                        var prog = 100-((100/maxTime) * recTime);
+                        var progress = 100-((100/maxTime) * recTime);
                         $( "#progressbar" ).progressbar({
-                            value: prog
+                            value: progress
                         });
                         $( "#progressbar" ).on( "progressbarcomplete", function( event, ui ) {
                                 //alert('Max time reached')
@@ -201,7 +274,7 @@ toubaApp
 
         function onSuccess() {
             $('#message').html('Audio file successfully created:<br />' + src);
-            //send(src); //will be removed
+            //send(src); //will be removed TODO
         }
 
         function send(recordURI) {
@@ -210,9 +283,20 @@ toubaApp
             var options = new FileUploadOptions();
             options.fileKey = "file";
             options.fileName = Data.fileName + Data.ext; //recordURI.substr(src.lastIndexOf('/')+1);
-            options.mimeType = "audio/x-wav"; //audio/mpeg    audio/x-wav
+            options.mimeType = Data.ext==='.mp3'?"audio/mpeg":"audio/x-wav"; //audio/mpeg    audio/x-wav
             options.chunkedMode = false;
             var fileTransfer = new FileTransfer();
+            /*fileTransfer.onprogress = function(progressEvent) {
+                if (progressEvent.lengthComputable) {
+                    //loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
+                    var progress = 100-((100/progressEvent.total) * progressEvent.loaded );
+                    $( "#progressbar" ).progressbar({
+                        value: progress
+                    });
+                } else {
+                    //loadingStatus.increment();
+                }
+            };*/
             fileTransfer.upload(
                 '/sdcard/'+recordURI,
                 SERVER_ADDRESS+'/records', // Remote server for uploading record
