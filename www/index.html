@@ -5,10 +5,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="lib/js/jquery.mobile/jquery.mobile-1.3.2.css" />
-    <link rel="stylesheet" href="lib/css/themes/touba-green.css" />
+    <link rel="stylesheet" href="lib/js/jquery-mobile.1.4/jquery.mobile-1.4.1.css" />
+    <link rel="stylesheet" href="lib/css/themes/tbv-green/tbv-green.css" />
+    <link rel="stylesheet" href="lib/css/themes/tbv-green/jquery.mobile.icons.min.css" />
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/trontastic/jquery-ui.css" />
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/trontastic/jquery.ui.theme.css" />
+
     <script src="bower_components/jquery/jquery.js"></script>
-    <script src="lib/js/jquery.mobile/jquery.mobile-1.3.2.js"></script>
+    <script src="bower_components/jquery-ui/ui/jquery-ui.js"></script>
+    <script src="bower_components/jquery-ui/ui/jquery.ui.progressbar.js"></script>
+    <script src="lib/js/jquery-mobile.1.4/jquery.mobile-1.4.1.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
     <script src="lib/js/underscore/underscore-min.js"></script>
@@ -37,15 +43,10 @@
                 <input id="password" type="text" placeholder="Password" required/>
             </li>
         </ul>
-        <button data-inline="true">
+        <button data-inline="true" data-theme="b">
             Sign in
         </button>
         <a href="#player" data-icon="gear">Go PLAY!</a>
-        <a href="#popupBasic" data-rel="popup">Open Popup</a>
-
-        <div data-role="popup" id="popupBasic">
-            <p>This is a completely basic popup, no options set.</p>
-        </div>
     </div>
 </div>
 
@@ -53,18 +54,18 @@
 <div id="player" data-role="page" ng-controller="PlayerController">
     <div data-role="header">
         <img src="img/logo.png" height="35" alt="Touba Voice">
-        <a href="logout.html" class="ui-btn-right">Logout</a>
-        <div data-role="navbar" data-iconpos="top">
+        <a href="logout.html" class="ui-btn-right" data-theme="b">Logout</a>
+        <div data-role="navbar" data-iconpos="left">
             <ul>
-                <li><a href="#" data-icon="grid">PLAYER</a></li>
-                <li><a href="#recorder" data-icon="gear">RECORDER</a></li>
+                <li><a href="#recorder" data-icon="gear" data-theme="c"><h3>RECORDER</h3></a></li>
+                <li><a href="#" data-icon="grid" data-theme="c"><h3>PLAYER</h3></a></li>
             </ul>
         </div>
     </div>
     <div data-role="content">
-        <ul data-role="listview" data-filter="true">
+        <ul data-role="listview" data-filter="true" data-theme="a">
             <li ng-repeat="record in records">
-                <a href="#record-detail" data-transition="slide" ng-click="selectRecord(record.fileName)" value="{{record.name}}">{{record.name||record.fileName}}</a>
+                <a href="#record-detail" ng-click="selectRecord(record.fileName)" value="{{record.name}}">{{record.name||record.fileName}}</a>
             </li>
         </ul>
     </div>
@@ -72,61 +73,52 @@
         <!--p>{{records.length}} Records found</p-->
         <div data-role="navbar" data-iconpos="top">
             <ul>
-                <li><a href="#" ng-click="deleteRecord(record.fileName)" data-icon="delete">Delete</a></li>
-                <li><a href="#" ng-click="sendRecord(record.fileName)" data-icon="forward">Send</a></li>
+                <li><a href="#" ng-click="deleteRecord(record.fileName)" data-icon="delete" data-theme="b"><h2>Delete</h2></a></li>
+                <li><a href="#" ng-click="sendRecord(record.fileName)" data-icon="forward" data-theme="b"><h2>Send</h2></a></li>
             </ul>
         </div>
     </div>
 </div>
 
-<div id="recorder" data-role="page">
+<div id="recorder" data-role="page" ng-controller="RecordController">
     <div data-role="header">
         <img src="img/logo.png" height="35" alt="Touba Voice">
-        <a href="logout.html" class="ui-btn-right">Logout</a>
-        <div data-role="navbar" data-iconpos="top">
+        <a href="logout.html" class="ui-btn-right" data-theme="b">Logout</a>
+        <div data-role="navbar" data-iconpos="left">
             <ul>
-                <li><a href="#player" data-icon="grid">PLAYER</a></li>
-                <li><a href="#" data-icon="gear">RECORDER</a></li>
+                <li><a href="#" data-icon="gear" data-theme="c"><h3>RECORDER</h3></a></li>
+                <li><a href="#player" data-icon="grid" data-theme="c"><h3>PLAYER</h3></a></li>
             </ul>
         </div>
     </div>
-    <div data-role="content">
-        <div ng-controller="RecordCtrl">
+    <div data-role="content" ng-controller="RecordController">
             {{recordPrepare()}}
-
 
             <div style="vertical-align:middle; text-align:center">
                 <h4 style="text-align: center">{{data.fileName}}{{data.ext}}</h4>
-                <img src="img/mic.jpg" style="max-height: 300px"/>
+                <img src="img/mic.jpg" style="max-height: 250px"/>
                 <div  style="text-align: center"></div>
                 <div id="message" style="text-align: center" class="h3">00:00</div>
                 <div style="text-align: center; width: 100%" id="progressbar">
                 </div>
 
             </div>
-        </div>
         <div data-role="popup" id="modal-dialog" title="Record name">
-            <form>
-                <ul data-role="listview" data-inset="true">
-                    <li data-role="fieldcontain">
-                        <label for="name">Saving record as</label>
-                        <input type="text"  ng-model="data.fileName" name="name" class="text ui-widget-content ui-corner-all" />
-                    </li>
-                    <button data-inline="true" onclick="$('#modal-dialog').dialog( 'close' );">Close</button>
-                    <button data-inline="true" id="record" >OK</button>
-                </ul>
-            </form>
+            <ul data-role="listview" data-inset="true">
+                <li data-role="fieldcontain">
+                    <label>Saving record as</label>
+                    <input type="text"  ng-model="data.fileName" class="text ui-widget-content ui-corner-all" />
+                </li>
+            </ul>
+            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="record">OK</a>
 
         </div>
-        <!--button data-inline="true" onclick="$.mobile.changePage('#record-list')" ng-click="completeRecord(record.fileName)">
-            Save
-        </button-->
     </div>
     <div data-role="footer" data-position="fixed">
         <div data-role="navbar" data-iconpos="top">
             <ul>
-                <li><a href="#modal-dialog" data-icon="delete" id="prepareRecord" data-rel="popup" data-position-to="window" data-role="button">RECORD</a></li>
-                <li><a href="#"  data-icon="forward" id="stop">DONE</a></li>
+                <li><a href="#modal-dialog" data-theme="b"  id="prepareRecord" data-rel="popup" data-position-to="window" ><h1>RECORD</h1></a></li>
+                <li><a href="#" data-theme="b"  id="stop"><h1>DONE</h1></a></li>
             </ul>
         </div>
     </div>
@@ -135,7 +127,7 @@
 
 
 <!--Record Detail Page-->
-<div id="record-detail" data-role="page" ng-controller="PlayerController">
+<div id="record-detail" data-role="page" >
     <div data-role="header">
         <a href="#" data-icon="back" data-rel="back">Back</a>
 
