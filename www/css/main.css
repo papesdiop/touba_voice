@@ -1,0 +1,16 @@
+.logo {
+    background: url("../img/logo1.png") no-repeat;
+    width: 116px;
+    height: 35px;
+    display: inline-block;
+    margin-left: 1%;
+    margin-top: 2px;
+}
+
+.home-img {
+    background: url("../img/touba.jpg") no-repeat;
+    width: auto;
+    height: 250px;
+    background-size: cover;
+    background-position: right;
+}

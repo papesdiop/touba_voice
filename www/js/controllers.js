@@ -26,6 +26,108 @@ function PlayerController($scope, $http, Record) {
             $scope.records = _.without($scope.records, $scope.record);
         });
     }
+
+    var audioMedia = null,
+        audioTimer = null,
+        duration = -1,
+        is_paused = false;
+
+    $("#playLocalAudio").bind('touchstart', function() {
+        stopAudio();
+        var srcLocal = '/android_asset/www/434921-1gtndm8.mp3';
+        playAudio(srcLocal);
+    });
+    $("#playRemoteAudio").bind('touchstart', function() {
+        stopAudio();
+        var srcRemote = 'http://toubavoiceserver-software.rhcloud.com/'+$scope.record.fileName;
+        playAudio(srcRemote);
+    });
+    $("#pauseaudio").bind('touchstart', function() {
+        pauseAudio();
+    });
+    $("#stopaudio").bind('touchstart', function() {
+        stopAudio();
+    });
+
+    function playAudio(src) {
+        if (audioMedia === null) {
+            $("#mediaDuration").html("0");
+            $("#audioPosition").html("Loading...");
+            audioMedia = new Media(src, onSuccess, onError);
+            audioMedia.play();
+        } else {
+            if (is_paused) {
+                is_paused = false;
+                audioMedia.play();
+            }
+        }
+        if (audioTimer === null) {
+            audioTimer = setInterval(function() {
+                audioMedia.getCurrentPosition(
+                    function(position) {
+                        if (position > -1) {
+                            setAudioPosition(Math.round(position));
+                            if (duration <= 0) {
+                                duration = audioMedia.getDuration();
+                                if (duration > 0) {
+                                    duration = Math.round(duration);
+                                    $("#mediaDuration").html(duration);
+                                }
+                            }
+                        }
+                    },
+                    function(error) {
+                        console.log("Error getting position=" + error);
+                        setAudioPosition("Error: " + error);
+                    }
+                );
+            }, 1000);
+        }
+    }
+
+    function pauseAudio() {
+        if (is_paused) return;
+        if (audioMedia) {
+            is_paused = true;
+            audioMedia.pause();
+        }
+    }
+
+    function stopAudio() {
+        if (audioMedia) {
+            audioMedia.stop();
+            //audioMedia.release(); //TODO
+            audioMedia = null;
+        }
+        if (audioTimer) {
+            clearInterval(audioTimer);
+            audioTimer = null;
+        }
+        is_paused = false;
+        duration = 0;
+    }
+
+    function setAudioPosition(position) {
+        $("#audioPosition").html(position + " sec");
+    }
+
+    function onSuccess() {
+        setAudioPosition(duration);
+        clearInterval(audioTimer);
+        audioTimer = null;
+        audioMedia = null;
+        is_paused = false;
+        duration = -1;
+    }
+    function onError(error) {
+        alert('code: ' + error.code + '\n' + 'message: ' + error.source + '\n');
+        clearInterval(audioTimer);
+        audioTimer = null;
+        audioMedia = null;
+        is_paused = false;
+        setAudioPosition("0");
+    }
+
 }
 
 function RecordController($scope, Data) {
@@ -100,7 +202,7 @@ function RecordController($scope, Data) {
 
     function onSuccess() {
         $('#message').html('Audio file successfully created:<br />' + src);
-        send(src); //will be removed TODO
+        ///send(src); //will be removed TODO
     }
 
     function send(recordURI) {
