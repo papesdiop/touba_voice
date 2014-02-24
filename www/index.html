@@ -35,7 +35,7 @@
     <div data-role="content" style="width: 70%;margin-left: 15%">
         <ul data-role="listview" data-inset="true">
             <li data-role="fieldcontain">
-                <label for="email">Email address</label>
+                <label for="email">Email</label>
                 <input id="email" type="text" placeholder="Email address" required autofocus/>
             </li>
             <li data-role="fieldcontain">
@@ -68,6 +68,20 @@
                 <a href="#record-detail" ng-click="selectRecord(record.fileName)" value="{{record.name}}">{{record.name||record.fileName}}</a>
             </li>
         </ul>
+        <div data-role="button" class="btn btn-primary btn-lg glyphicon glyphicon-bold glyphicon-play"
+             id="playLocalAudio"></div>
+        <div data-role="button" class="btn btn-primary glyphicon glyphicon-bold glyphicon-play"
+             id="playRemoteAudio"></div>
+        <div data-role="button" class="btn btn-primary btn-lg glyphicon glyphicon-bold glyphicon-pause"
+             id="pauseaudio"></div>
+        <div data-role="button" class="btn btn-primary btn-lg glyphicon glyphicon-bold glyphicon-stop"
+             id="stopaudio"></div>
+        <div class="ui-grid-a">
+            <div class="ui-block-a"> Current:
+                <span id="audioPosition">0 sec</span></div>
+            <div class="ui-block-b">Total:
+                <span id="mediaDuration">0</span> sec</div>
+        </div>
     </div>
     <div data-role="footer" data-position="fixed">
         <!--p>{{records.length}} Records found</p-->
