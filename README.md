@@ -15,4 +15,4 @@ cordova plugins used are :
 'org.apache.cordova.media',  
 'org.apache.cordova.media-capture' ]  
   
-  ![illustration](http://uploads.siteduzero.com/files/420001_421000/420263.png)
+  ![illustration](https://github.com/papesdiop/touba_voice/blob/develop/www/img/touba.jpg)
