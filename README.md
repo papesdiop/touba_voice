@@ -9,8 +9,10 @@ The android application is available on : http://toubavoiceserver-software.rhclo
 
 cordova plugins used are :
 
-[ 'org.apache.cordova.device',
-'org.apache.cordova.file',
-'org.apache.cordova.file-transfer',
-'org.apache.cordova.media',
-'org.apache.cordova.media-capture' ]
+[ 'org.apache.cordova.device',  
+'org.apache.cordova.file',  
+'org.apache.cordova.file-transfer',  
+'org.apache.cordova.media',  
+'org.apache.cordova.media-capture' ]  
+  
+  ![illustration](http://uploads.siteduzero.com/files/420001_421000/420263.png)
