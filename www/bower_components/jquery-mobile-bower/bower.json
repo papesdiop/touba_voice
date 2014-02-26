@@ -1,0 +1,11 @@
+{
+  "name": "jquery-mobile-bower",
+  "version": "1.4.0",
+  "dependencies": {
+    "jquery": "~1.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jobrapido/jquery-mobile-bower.git"
+  }
+}

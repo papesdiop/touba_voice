@@ -1,0 +1,32 @@
+{
+  "name": "www",
+  "version": "0.0.0",
+  "homepage": "https://github.com/papesdiop/touba_voice",
+  "authors": [
+    "papesdiop <papesdiop@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "1.2.0",
+    "angular-bootstrap": "~0.10.0",
+    "jquery": "~2.1.0",
+    "angular-ui-router": "0.2.8-bowratic-tedium",
+    "jquery-mobile-bower": "latest",
+    "angular-resource": "~1.2.12",
+    "jquery-ui": "~1.10.4"
+  },
+  "description": "touba application for mourid community",
+  "main": "index.html",
+  "keywords": [
+    "touba",
+    "c4a"
+  ],
+  "private": true
+}

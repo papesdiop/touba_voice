@@ -1,27 +1,19 @@
-#record {
-    display: block;
-    padding: .4em .8em;
-    text-decoration: none;
-    text-shadow: 1px 1px 1px rgba(0,0,0,.3);
-    -webkit-transition:.3s -webkit-box-shadow, .3s padding;
-    transition:.3s box-shadow, .3s padding;
-    border-radius: 200px;
-    background: rgba(255,0,0,.6);
-    width: 10em;
-    height: 10em;
-    color: white;
-}
 
 /** http://angular-ui.github.io/bootstrap/#/getting_started CSS section
  Resolve conflict between angular and bootstrap with empty href (different interpretation)
  **/
-/*.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }*/
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
 /**App Theming**/
 
-.logo{
-    width: 108px;
-    top: 1px;
+.logo {
+    background: url("../img/logo1.png") no-repeat;
+    width: 116px;
+    height: 44px;
+    display: inline-block;
+    margin-left: 2%;
+    margin-top: 2%;
+
 }
 
 .navbar-inverse {

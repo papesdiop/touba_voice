@@ -1,0 +1,29 @@
+<div class="container-fluid"  id="recordList">
+
+    <ul data-role="listview" data-filter="true" data-filter-placeholder="Search fruits..." data-inset="true">
+        <li ng-repeat="item in records">{{ item.name || item.fileName }}</li>
+    </ul>
+
+</div>
+
+<div data-role="page" id="page-home">
+    <div data-role="header">
+        <h1>PhoneGap Audio Player</h1>
+    </div>
+    <div data-role="content">
+        <div data-role="button" class="btn btn-primary btn-lg glyphicon glyphicon-bold glyphicon-play"
+             id="playLocalAudio"></div>
+        <div data-role="button" class="btn btn-primary glyphicon glyphicon-bold glyphicon-play"
+             id="playRemoteAudio"></div>
+        <div data-role="button" class="btn btn-primary btn-lg glyphicon glyphicon-bold glyphicon-pause"
+             id="pauseaudio"></div>
+        <div data-role="button" class="btn btn-primary btn-lg glyphicon glyphicon-bold glyphicon-stop"
+             id="stopaudio"></div>
+        <div class="ui-grid-a">
+            <div class="ui-block-a"> Current:
+                <span id="audioPosition">0 sec</span></div>
+            <div class="ui-block-b">Total:
+                <span id="mediaDuration">0</span> sec</div>
+        </div>
+    </div>
+</div>
