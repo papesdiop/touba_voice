@@ -59,7 +59,7 @@
     <div data-role="content">
         <ul data-role="listview" data-filter="true" data-theme="a">
             <li ng-repeat="record in records">
-                <a href="#" ng-click="selectRecord(record.fileName)" value="{{record.name}}">{{record.name||record.fileName}}</a>                
+                <a href="#" ng-click="selectRecord(record.name)" value="{{record.name}}">{{record.name||record.fileName}}</a>                
             </li>
         </ul>
     </div>

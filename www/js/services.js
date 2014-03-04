@@ -31,14 +31,14 @@ function onRequestFileSystemSuccess(fileSystem) {
         function (dir) {
             console.log("Created dir "+ dir.name);
             directory = dir;
-            reader = dir.createReader();           
+            reader = directory.createReader();           
             reader.readEntries(
                 function (entries) {
                     console.log("The dir has "+entries.length+" entries.");
                     // Scan for audio src
                     for (var i=0; i<entries.length; i++) {
                         console.log(entries[i].name+' dir? '+entries[i].isDirectory);
-                        records.push({'_id': i,'fileName':entries[i].fileName, 'name':entries[i].name})                       
+                        records.push({'_id': i,'fileName':entries[i].name, 'name':entries[i].name})                       
                     }                                                        
                 },
                 function (error) {
@@ -65,8 +65,7 @@ var module1 = angular.module('RecordService', ['ngResource']).factory('Record', 
     .factory('Data', function(){
         return {
             fileName: 'My Recording',
-            ext: '.mp3', //file extension .mp3, .wav
-            maxTime : 10, // Max time for record in seconde
+            ext: '.mp3', //file extension .mp3, .wav            
             src:null
         }
     })

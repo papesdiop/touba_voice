@@ -1,54 +1,21 @@
 function PlayerController($scope, $http, Record) {
     $scope.fetchRemoteRecords = function(){
-        $scope.records = Record.query(); 
-    }
-    
-    /*appendRecord = function(records){
-        $('[data-role=listview]').empty();
-        records.forEach(function(record){
-            $('[data-role=listview]').append('<li><a href="#" ng-click="selectRecord('+record.fileName+')" value="'+record.name+'">'+record.name||record.fileName+'</a></li>')
-        })
-    }*/
+        $scope.records = Record.query();
+        $('[data-role=listview]').listview('refresh')
+    }   
     
     $scope.fetchLocalRecords = function(){
-        $scope.records = records;
-        /*if (reader!=null) {
-            records =[]
-            reader = directory.createReader();
-            reader.readEntries(
-                function (entries) {
-                    console.log("The dir has "+entries.length+" entries.");
-                    // Scan for audio src
-                    for (var i=0; i<entries.length; i++) {
-                        console.log(entries[i].name+' dir? '+entries[i].isDirectory);
-                        records.push({'_id': i,'fileName':entries[i].fileName, 'name':entries[i].name})                       
-                    }
-                    $scope.records = records;                    
-                    //appendRecord(records)
-                    //$('[data-role=listview]').listview('refresh')
-                },
-                function (error) {
-                    alert('onError(): '    + error.code    + '\n' +
-                        'message: ' + error.message + '\n');
-                })
-            
-            //wait 1s
-            //setTimeout(function(){
-                //alert('I waited 1s for synchronous read directory!')
-               // alert('r' +r)
-            //}, 1000)
-        }*/
+        $scope.records = records;       
+        $('[data-role=listview]').listview('refresh')
     }
     
-    if ($scope.records==null) {
-        alert('length :' +records.length)
+    if ($scope.records==null) {        
         $scope.records = Record.query();
         //$scope.fetchLocalRecords();
     }   
 
-    $scope.selectRecord = function (fileName) {
-        alert('file :' + fileName)
-        $scope.record = _.where($scope.records, {fileName: fileName})[0];
+    $scope.selectRecord = function (fileName) {        
+        $scope.record = _.where($scope.records, {name: fileName})[0];        
     }
 
     $scope.newRecord = function () {
@@ -72,39 +39,28 @@ function PlayerController($scope, $http, Record) {
             $scope.records = _.without($scope.records, $scope.record);
         });
     }
-    
-    $scope.playLocalRecord = function(){
-        entry.getFile('touba_voice/'+$scope.record.fileName, {create:true},
-                      function readFile(f) {
-                        reader = new FileReader();
-                        reader.onloadend = function(e) {
-                            console.log("go to end");
-                            logit("<pre>" + e.target.result + "</pre><p/>");
-                        }
-                        reader.readAsText(f)
-                        },
-                      null);
-    }
-    
-    
+      
     var audioMedia = null,
         audioTimer = null,
         duration = -1,
         is_paused = false;
-
+        
     $("#playLocalAudio").bind('touchstart', function() {
         stopAudio();
-        var srcLocal = '/sdcard/touba_voice/Jambar.mp3';
-        playAudio(srcLocal);
+        var srcLocal = '/sdcard/touba_voice/'+$scope.record.fileName||$scope.record.name;        
+        playAudio(srcLocal);               
     });
+    
     $("#playRemoteAudio").bind('touchstart', function() {
         stopAudio();
-        var srcRemote = SERVER_ADDRESS+'/'+$scope.record.name;
+        var srcRemote = SERVER_ADDRESS+'/'+$scope.record.fileName||$scope.record.name;        
         playAudio(srcRemote);
     });
+    
     $("#pauseaudio").bind('touchstart', function() {
         pauseAudio();
     });
+    
     $("#stopaudio").bind('touchstart', function() {
         stopAudio();
     });
@@ -156,7 +112,7 @@ function PlayerController($scope, $http, Record) {
     function stopAudio() {
         if (audioMedia) {
             audioMedia.stop();
-            //audioMedia.release(); //TODO
+            audioMedia.release(); //TODO
             audioMedia = null;
         }
         if (audioTimer) {
@@ -201,17 +157,7 @@ function RecordController($scope, Data) {
         $('#record').bind('touchstart', function (){
             //$( "#dialog-modal" ).dialog( "close" );
             recordAudio($scope, Data);
-        });
-        /*$( "#dialog-modal" ).dialog({
-            autoOpen: false,
-            width: 350,
-            modal: true
-        });
-        $( "#prepareRecord" )
-            .button()
-            .click(function() {
-                $( "#dialog-modal" ).dialog( "open" );
-            });*/
+        });       
     };
 
     function stopRecording() {
@@ -222,8 +168,7 @@ function RecordController($scope, Data) {
         recordPrepare();
     }
 
-    var recordAudio =  function($scope, Data) {
-        //$('#prepareRecord').attr("disabled", true);
+    var recordAudio =  function($scope, Data) {        
         $('#record').unbind();
         $('#record').html('Stop recording');
         $('#stop').bind('touchstart', function() {
@@ -291,8 +236,7 @@ function RecordController($scope, Data) {
             fileUploaded,
             onError,
             options
-        );
-        //$('#message').html('Audio file successfully sent:<br />' + src);
+        );        
     }
 
     function fileUploaded(result) {
