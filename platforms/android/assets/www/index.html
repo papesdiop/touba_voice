@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html ng-app="RecordService">
+<head>
+    <title>Touba Voice Mobile</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="lib/js/jquery-mobile.1.4/jquery.mobile-1.4.1.css" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <!--link rel="stylesheet" href="lib/css/themes/tbv-green/touba-green.css" /-->
+    <link rel="stylesheet" href="lib/css/themes/tbv-green/tbv-green.css" />
+    <link rel="stylesheet" href="lib/css/themes/tbv-green/jquery.mobile.icons.min.css" />
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/trontastic/jquery-ui.css" />
+    <link rel="stylesheet" href="bower_components/jquery-ui/themes/trontastic/jquery.ui.theme.css" />
+    <link rel="stylesheet"  href="lib/css/jqm-icons/icon-pack-custom.css" />
+
+</head>
+<body >
+
+<div data-role="page" id="login">
+    <div data-role="header" data-position="fixed">
+        <div class="logo"></div>
+        <div class="home-img"></div>
+        <div data-theme="b">
+            <h1 style="text-align: center; font-weight: bolder">Sign in Below</h1>
+        </div>
+    </div>
+    <div data-role="content" style="width: 70%;margin-left: 15%">
+        <h2 style="text-align: center">Enter Your Login Information!</h2>
+        <ul data-role="listview" data-inset="true">
+            <li data-role="fieldcontain">
+                <label for="email">Email</label>
+                <input id="email" type="text" placeholder="Email address" required autofocus/>
+            </li>
+            <li data-role="fieldcontain">
+                <label for="password">Password</label>
+                <input id="password" type="text" placeholder="Password" required/>
+            </li>
+        </ul>
+        <span style="color: #ff0000"></span>
+        <a href="#player" data-icon="sign-in" class="ui-btn ui-icon-sign-in ui-btn-icon-left ui-btn-inline" data-role="button" >Sign in</a>
+    </div>
+</div>
+
+<!--Record List Page-->
+<div id="player" data-role="page" ng-controller="PlayerController">
+    <div data-role="header" data-position="fixed">
+        <div class="logo"></div>
+        <a href="#login" class="ui-btn-right" data-theme="b">Logout</a>
+        <div data-role="navbar" data-iconpos="left">
+            <ul>
+                <li><a href="#recorder" data-icon="gear" data-theme="c" data-transition="slide" data-direction="reverse" data-role="button"><h3>RECORDER</h3></a></li>
+                <li><a href="#" data-icon="grid" data-theme="c" data-transition="slide" data-role="button" ><h3>PLAYER</h3></a></li>
+            </ul>
+        </div>
+    </div>
+    <a href="#" class="ui-btn ui-icon-refresh ui-btn-icon-left ui-btn-inline" data-role="button" ng-click="fetchLocalRecords()"></a>
+    <a href="#" class="ui-btn ui-icon-cloud-upload ui-btn-icon-left ui-btn-inline" data-role="button" ng-click="fetchRemoteRecords()" ></a>
+    <div data-role="content">
+        <ul data-role="listview" data-filter="true" data-theme="a">
+            <li ng-repeat="record in records">
+                <a href="#" ng-click="selectRecord(record.name)" value="{{record.name}}">{{record.name||record.fileName}}</a>                
+            </li>
+        </ul>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <div data-role="navbar"  class="ui-bar-b">
+            <h3 style="text-align: center">{{record.name||record.fileName}}</h3>
+        </div>
+        <div data-role="navbar" data-iconpos="top">
+            <div class="ui-grid-a">
+                <div class="ui-block-a"> Current:
+                    <span id="audioPosition">0 sec</span></div>
+                <div class="ui-block-b">Total:
+                    <span id="mediaDuration">0</span> sec</div>
+            </div>
+        </div>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li><a href="#" data-theme="a" id="playLocalAudio" data-role="button" data-icon="play-circle-o"><span class="muted">Play</span></a></li>
+                <li><a href="#" data-theme="a" id="playRemoteAudio" data-role="button" data-icon="play"><span class="muted">Play Remote</span></a></li>
+                <li><a href="#" data-theme="a" id="pauseAudio" data-role="button" data-icon="pause"><span class="muted">Pause</span></a></li>
+                <li><a href="#" data-theme="a" id="stopaudio" data-role="button" data-icon="stop"><span class="muted">Stop</span></a></li>
+            </ul>
+        </div>
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li><a href="#" ng-click="deleteRecord(record.fileName)" data-icon="delete" data-theme="b"><h2>Delete</h2></a></li>
+                <li><a href="#" ng-click="sendRecord(record.fileName)" data-icon="forward" data-theme="b"><h2>Send</h2></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="recorder" data-role="page" ng-controller="RecordController">
+    <div data-role="header" data-position="fixed">
+        <div class="logo"></div>
+        <a href="#login" class="ui-btn-right" data-theme="b" data-transition="slide" data-role="button">Logout</a>
+        <div data-role="navbar" data-iconpos="left">
+            <ul>
+                <li><a href="#" data-icon="gear" data-theme="c" data-transition="slide"><h3>RECORDER</h3></a></li>
+                <li><a href="#player" data-icon="grid" data-theme="c" data-transition="slide"><h3>PLAYER</h3></a></li>
+            </ul>
+        </div>
+    </div>
+    <div data-role="content" ng-controller="RecordController">
+            {{recordPrepare()}}
+
+            <div style="vertical-align:middle; text-align:center">
+                <h4 style="text-align: center">{{data.fileName}}{{data.ext}}</h4>
+                <img src="img/mic.jpg" style="max-height: 250px"/>
+                <div  style="text-align: center"></div>
+                <div id="message" style="text-align: center" class="h3">00:00</div>
+                <div style="text-align: center; width: 100%" id="progressbar">
+                </div>
+
+            </div>
+        <div data-role="popup" id="modal-dialog" title="Record name">
+            <ul data-role="listview" data-inset="true">
+                <li data-role="fieldcontain">
+                    <label>Saving record as</label>
+                    <input type="text"  ng-model="data.fileName" class="text ui-widget-content ui-corner-all" />
+                </li>
+            </ul>
+            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" id="record">OK</a>
+
+        </div>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <div data-role="navbar" data-iconpos="top">
+            <ul>
+                <li><a href="#modal-dialog" data-theme="b"  id="prepareRecord" data-rel="popup" data-position-to="window" ><h1>RECORD</h1></a></li>
+                <li><a href="#" data-theme="b"  id="stop"><h1>DONE</h1></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+<!--Record Detail Page-->
+<div id="record-detail" data-role="page" >
+    <div data-role="header">
+        <a href="#" data-icon="back" data-rel="back">Back</a>
+
+        <h1>{{record.name}}</h1>
+        <a href="#record-list" ng-click="saveRecord()" data-icon="check" class="ui-btn-right">Save</a>
+    </div>
+    <div data-role="content">
+        <ul data-role="listview" data-inset="true">
+            <li data-role="fieldcontain">
+                <label for="name">Record name</label>
+                <input id="name" type="text" ng-model="record.name"/>
+            </li>
+            <li data-role="fieldcontain">
+                <label for="body">Body</label>
+                <textarea id="body" cols="40" rows="8" ng-model="record"></textarea>
+            </li>
+            <li data-role="fieldcontain">
+                <label for="size">Size</label>
+                <input id="size" type="text" ng-model="record.size"/>
+            </li>
+            <li data-role="fieldcontain">
+                <label for="fileName">Context</label>
+                <input id="fileName" type="text" ng-model="record.fileName"/>
+            </li>
+            <li data-role="fieldcontain">
+                <label for="date">Date</label>
+                <input id="date" type="date" ng-model="record.date"/>
+            </li>
+        </ul>
+        <button data-inline="true" onclick="$.mobile.changePage('#record-list')" ng-click="completeRecord(record.fileName)">
+            Save
+        </button>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <p>Record ID: {{record.name||record.fileName}} / {{record.id}}</p>
+    </div>
+</div>
+
+<script src="bower_components/jquery/jquery.js"></script>
+<script src="bower_components/jquery-ui/ui/jquery-ui.js"></script>
+<script src="bower_components/jquery-ui/ui/jquery.ui.progressbar.js"></script>
+<script src="lib/js/jquery-mobile.1.4/jquery.mobile-1.4.1.js"></script>
+
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular-resource/angular-resource.js"></script>
+<script src="lib/js/underscore/underscore-min.js"></script>
+
+<script type="text/javascript" src="cordova.js"></script>
+
+<script src="js/services.js"></script>
+<script src="js/controllers.js"></script>
+
+</body>
+</html>

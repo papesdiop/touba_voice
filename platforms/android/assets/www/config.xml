@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.coders4africa.touba_voice" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>ToubaVoice</name>
+    <description>
+        A sample Apache Cordova application that responds to the deviceready event.
+    </description>
+    <author email="papesdiop@gmail.com" href="http://coders4africa.com">
+        Coders4Africa Team
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+</widget>

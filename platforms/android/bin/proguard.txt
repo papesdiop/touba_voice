@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:6
+-keep class com.coders4africa.toubavoice.HelloCordova { <init>(...); }
+
