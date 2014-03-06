@@ -66,6 +66,7 @@
     <div data-role="footer" data-position="fixed">
         <div data-role="navbar"  class="ui-bar-b">
             <h3 style="text-align: center">{{record.name||record.fileName}}</h3>
+            <div id="messagePlayer" style="text-align: center" class="h3"></div>
         </div>
         <div data-role="navbar" data-iconpos="top">
             <div class="ui-grid-a">
@@ -77,16 +78,16 @@
         </div>
         <div data-role="navbar" data-iconpos="top">
             <ul>
-                <li><a href="#" data-theme="a" id="playLocalAudio" data-role="button" data-icon="play-circle-o"><span class="muted">Play</span></a></li>
-                <li><a href="#" data-theme="a" id="playRemoteAudio" data-role="button" data-icon="play"><span class="muted">Play Remote</span></a></li>
+                <li style="display: {{isLocal?'':'none'}}"><a href="#" data-theme="a" id="playLocalAudio" data-role="button" data-icon="play-circle-o"><span class="muted">Play</span></a></li>
+                <li style="display: {{isLocal?'none':''}}"><a href="#" data-theme="a" id="playRemoteAudio" data-role="button" data-icon="play"><span class="muted">Play Remote</span></a></li>
                 <li><a href="#" data-theme="a" id="pauseAudio" data-role="button" data-icon="pause"><span class="muted">Pause</span></a></li>
                 <li><a href="#" data-theme="a" id="stopaudio" data-role="button" data-icon="stop"><span class="muted">Stop</span></a></li>
             </ul>
         </div>
-        <div data-role="navbar" data-iconpos="top">
+        <div data-role="navbar" data-iconpos="top" style="display: {{isLocal?'':'none'}}">
             <ul>
-                <li><a href="#" ng-click="deleteRecord(record.fileName)" data-icon="delete" data-theme="b"><h2>Delete</h2></a></li>
-                <li><a href="#" ng-click="sendRecord(record.fileName)" data-icon="forward" data-theme="b"><h2>Send</h2></a></li>
+                <li><a href="#" ng-click="removeRecord()" data-icon="delete" data-theme="b"><h2>Delete</h2></a></li>
+                <li><a href="#" ng-click="sendRecord()" data-icon="forward" data-theme="b"><h2>Send</h2></a></li>
             </ul>
         </div>
     </div>

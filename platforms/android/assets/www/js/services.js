@@ -48,13 +48,23 @@ function onRequestFileSystemSuccess(fileSystem) {
                         
         }
         ,function (error) {
-            //alert("Error creating directory" + error.code);
+            alert("Error creating directory" + error.code);
         });
 }
 
 function onDeviceReady() {
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onRequestFileSystemSuccess, null);
 }
+
+function onRemoveRecord(fileEntry){
+    console.log(fileEntry);
+    fileEntry.remove(function (entry) {
+            console.log("Removal succeeded");
+        }, function (error) {
+            console.log("Error removing file: " + error.code);
+        });
+}
+
 
 var module1 = angular.module('RecordService', ['ngResource']).factory('Record', ['$resource', function ($resource) {
     var Record = $resource(SERVER_ADDRESS+'/records', {}, {

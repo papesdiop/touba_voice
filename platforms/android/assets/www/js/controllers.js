@@ -1,12 +1,28 @@
-function PlayerController($scope, $http, Record) {
+function fileUploaded(result) {
+    $("#messagePlayer").html('<p><b>Upload complete!!<br />Bytes sent: ' + result.bytesSent + '</b></p>');
+    setTimeout(function(){
+        $("#messagePlayer").html('');
+    }, 1500)
+}
+
+function onError(error) {
+    $('#message').html('code: ' + error.code + 'message: ' + error.message + '\n');
+    console.dir(error)
+}
+
+function PlayerController($scope, $http, Record, Data) {
+    $scope.isLocal=false;
     $scope.fetchRemoteRecords = function(){
         $scope.records = Record.query();
-        $('[data-role=listview]').listview('refresh')
+        $scope.isLocal=false;
+        $('[data-role=listview]').listview().listview('refresh')        
     }   
     
     $scope.fetchLocalRecords = function(){
-        $scope.records = records;       
-        $('[data-role=listview]').listview('refresh')
+        $scope.records = records;
+        $scope.isLocal=true;
+        $('[data-role=listview]').listview().listview('refresh')
+        
     }
     
     if ($scope.records==null) {        
@@ -38,6 +54,50 @@ function PlayerController($scope, $http, Record) {
         Record.delete({fileName: fileName}, function () {
             $scope.records = _.without($scope.records, $scope.record);
         });
+    }
+    
+    $scope.removeRecord = function(){
+        entry.getFile('touba_voice/'+ $scope.record.name, {create: false, exclusive: false}, function (fileEntry){
+        console.log(fileEntry);
+        fileEntry.remove(function (entry) {
+                    console.log("Removal succeeded");
+            }, function (error) {
+                console.log("Error removing file: " + error.code);
+            });
+        }
+        , function (error) {
+            alert("Error deleting record" + $scope.record.name + ", error code :" + error.code);
+        })
+    }
+    
+    $scope.sendRecord = function () {
+        var recordURI= 'touba_voice/'+$scope.record.name;       
+        console.log('RECORD URI : ' + recordURI);
+        $("#messagePlayer").html("<p>Sending "+recordURI+"</p>");
+        var options = new FileUploadOptions();
+        options.fileKey = "file";
+        options.fileName = $scope.record.name; //recordURI.substr(src.lastIndexOf('/')+1);
+        options.mimeType = Data.ext==='.mp3'?"audio/mpeg":"audio/x-wav"; //audio/mpeg    audio/x-wav
+        options.chunkedMode = false;
+        var fileTransfer = new FileTransfer();
+        /*fileTransfer.onprogress = function(progressEvent) {
+         if (progressEvent.lengthComputable) {
+         //loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
+         var progress = 100-((100/progressEvent.total) * progressEvent.loaded );
+         $( "#progressbar" ).progressbar({
+         value: progress
+         });
+         } else {
+         //loadingStatus.increment();
+         }
+         };*/
+        fileTransfer.upload(
+            '/sdcard/'+recordURI,
+            SERVER_ADDRESS+'/records', // Remote server for uploading record
+            fileUploaded,
+            onError,
+            options
+        );        
     }
       
     var audioMedia = null,
@@ -112,7 +172,7 @@ function PlayerController($scope, $http, Record) {
     function stopAudio() {
         if (audioMedia) {
             audioMedia.stop();
-            audioMedia.release(); //TODO
+            //audioMedia.release(); //TODO
             audioMedia = null;
         }
         if (audioTimer) {
@@ -207,45 +267,8 @@ function RecordController($scope, Data) {
 
     function onSuccess() {
         $('#message').html('Audio file successfully created:<br />' + src);
-        send(src); //will be removed TODO
+        //send(src); //will be removed TODO
     }
 
-    function send(recordURI) {
-        console.log('RECORD URI : ' + recordURI);
-        $("#message").html("<p>Sending "+recordURI+"</p>");
-        var options = new FileUploadOptions();
-        options.fileKey = "file";
-        options.fileName = Data.fileName + Data.ext; //recordURI.substr(src.lastIndexOf('/')+1);
-        options.mimeType = Data.ext==='.mp3'?"audio/mpeg":"audio/x-wav"; //audio/mpeg    audio/x-wav
-        options.chunkedMode = false;
-        var fileTransfer = new FileTransfer();
-        /*fileTransfer.onprogress = function(progressEvent) {
-         if (progressEvent.lengthComputable) {
-         //loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
-         var progress = 100-((100/progressEvent.total) * progressEvent.loaded );
-         $( "#progressbar" ).progressbar({
-         value: progress
-         });
-         } else {
-         //loadingStatus.increment();
-         }
-         };*/
-        fileTransfer.upload(
-            '/sdcard/'+recordURI,
-            SERVER_ADDRESS+'/records', // Remote server for uploading record
-            fileUploaded,
-            onError,
-            options
-        );        
-    }
-
-    function fileUploaded(result) {
-        $("#message").html('<p>Upload complete!!<br />Bytes sent: ' + result.bytesSent + '</p>');
-        //$("#returnMessage").attr("src", result.response);
-    }
-
-    function onError(error) {
-        $('#message').html('code: ' + error.code + 'message: ' + error.message + '\n');
-        console.dir(error)
-    }
+    
 }
