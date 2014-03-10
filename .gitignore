@@ -1,4 +1,5 @@
 platforms/
+/platforms/android
 plugins/
 lib/
 .idea/

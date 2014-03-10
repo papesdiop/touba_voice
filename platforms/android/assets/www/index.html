@@ -55,7 +55,7 @@
         </div>
     </div>
     <a href="#" class="ui-btn ui-icon-refresh ui-btn-icon-left ui-btn-inline" data-role="button" ng-click="fetchLocalRecords()"></a>
-    <a href="#" class="ui-btn ui-icon-cloud-upload ui-btn-icon-left ui-btn-inline" data-role="button" ng-click="fetchRemoteRecords()" ></a>
+    <a href="#" class="ui-btn ui-icon-cloud-upload ui-btn-icon-left ui-btn-inline" data-role="button" ng-click="fetchRemoteRecords()"></a>
     <div data-role="content">
         <ul data-role="listview" data-filter="true" data-theme="a">
             <li ng-repeat="record in records">
@@ -78,8 +78,7 @@
         </div>
         <div data-role="navbar" data-iconpos="top">
             <ul>
-                <li style="display: {{isLocal?'':'none'}}"><a href="#" data-theme="a" id="playLocalAudio" data-role="button" data-icon="play-circle-o"><span class="muted">Play</span></a></li>
-                <li style="display: {{isLocal?'none':''}}"><a href="#" data-theme="a" id="playRemoteAudio" data-role="button" data-icon="play"><span class="muted">Play Remote</span></a></li>
+                <li><a href="#" data-theme="a" id="playAudio" data-role="button" data-icon="play-circle-o"><span class="muted">Play</span></a></li>               
                 <li><a href="#" data-theme="a" id="pauseAudio" data-role="button" data-icon="pause"><span class="muted">Pause</span></a></li>
                 <li><a href="#" data-theme="a" id="stopaudio" data-role="button" data-icon="stop"><span class="muted">Stop</span></a></li>
             </ul>

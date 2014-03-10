@@ -38,7 +38,11 @@ function onRequestFileSystemSuccess(fileSystem) {
                     // Scan for audio src
                     for (var i=0; i<entries.length; i++) {
                         console.log(entries[i].name+' dir? '+entries[i].isDirectory);
-                        records.push({'_id': i,'fileName':entries[i].name, 'name':entries[i].name})                       
+                        records.push({'_id': i,'fileName':entries[i].name, 'name':entries[i].name})
+                        //TODO default limited list to 10
+                        if (i>=10) {
+                            break;
+                        }
                     }                                                        
                 },
                 function (error) {
@@ -55,16 +59,6 @@ function onRequestFileSystemSuccess(fileSystem) {
 function onDeviceReady() {
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onRequestFileSystemSuccess, null);
 }
-
-function onRemoveRecord(fileEntry){
-    console.log(fileEntry);
-    fileEntry.remove(function (entry) {
-            console.log("Removal succeeded");
-        }, function (error) {
-            console.log("Error removing file: " + error.code);
-        });
-}
-
 
 var module1 = angular.module('RecordService', ['ngResource']).factory('Record', ['$resource', function ($resource) {
     var Record = $resource(SERVER_ADDRESS+'/records', {}, {

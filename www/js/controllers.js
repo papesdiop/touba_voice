@@ -15,13 +15,17 @@ function PlayerController($scope, $http, Record, Data) {
     $scope.fetchRemoteRecords = function(){
         $scope.records = Record.query();
         $scope.isLocal=false;
-        $('[data-role=listview]').listview().listview('refresh')        
+        setTimeout(function(){
+            $('[data-role=listview]').listview().listview('refresh')
+        },1000)        
     }   
     
     $scope.fetchLocalRecords = function(){
         $scope.records = records;
         $scope.isLocal=true;
-        $('[data-role=listview]').listview().listview('refresh')
+        setTimeout(function(){
+            $('[data-role=listview]').listview().listview('refresh')
+        },200)
         
     }
     
@@ -105,7 +109,18 @@ function PlayerController($scope, $http, Record, Data) {
         duration = -1,
         is_paused = false;
         
-    $("#playLocalAudio").bind('touchstart', function() {
+    $("#playAudio").bind('touchstart', function() {
+        stopAudio();
+        if($scope.isLocal){
+            var srcLocal = '/sdcard/touba_voice/'+$scope.record.fileName||$scope.record.name;        
+            playAudio(srcLocal); 
+        }else{
+            var srcRemote = SERVER_ADDRESS+'/'+$scope.record.fileName||$scope.record.name;        
+            playAudio(srcRemote);
+        }              
+    });        
+        
+    /*$("#playLocalAudio").bind('touchstart', function() {
         stopAudio();
         var srcLocal = '/sdcard/touba_voice/'+$scope.record.fileName||$scope.record.name;        
         playAudio(srcLocal);               
@@ -115,7 +130,7 @@ function PlayerController($scope, $http, Record, Data) {
         stopAudio();
         var srcRemote = SERVER_ADDRESS+'/'+$scope.record.fileName||$scope.record.name;        
         playAudio(srcRemote);
-    });
+    });*/
     
     $("#pauseaudio").bind('touchstart', function() {
         pauseAudio();
