@@ -107,7 +107,8 @@ function PlayerController($scope, $http, Record, Data) {
     var audioMedia = null,
         audioTimer = null,
         duration = -1,
-        is_paused = false;
+        is_paused = false,
+        mediaStatus;
         
     $("#playAudio").bind('touchstart', function() {
         stopAudio();
@@ -139,13 +140,20 @@ function PlayerController($scope, $http, Record, Data) {
     $("#stopaudio").bind('touchstart', function() {
         stopAudio();
     });
+    
+    $("#fastForwardAudio").bind('touchstart', function() {
+        forwardAudio();
+    });
 
     function playAudio(src) {
         if (audioMedia === null) {
             $("#mediaDuration").html("0");
             $("#audioPosition").html("Loading...");
-            audioMedia = new Media(src, onSuccess, onError);
-            audioMedia.play();
+            audioMedia = new Media(src, onSuccess, onError, function(status){
+                console.log('MEDIA STATUS AUDIO ' + status)
+                mediaStatus = status;
+                });
+            audioMedia.play({ playAudioWhenScreenIsLocked : false });
         } else {
             if (is_paused) {
                 is_paused = false;
@@ -157,7 +165,7 @@ function PlayerController($scope, $http, Record, Data) {
                 audioMedia.getCurrentPosition(
                     function(position) {
                         if (position > -1) {
-                            setAudioPosition(Math.round(position));
+                            setAudioPosition(Math.round(position));                            
                             if (duration <= 0) {
                                 duration = audioMedia.getDuration();
                                 if (duration > 0) {
@@ -175,6 +183,32 @@ function PlayerController($scope, $http, Record, Data) {
             }, 1000);
         }
     }
+    
+    function forwardAudio(){
+        console.log('AUDIO MEDIA OBJECT:' + audioMedia);
+        if (audioMedia!=null && mediaStatus== 2) {            
+            audioMedia.getCurrentPosition(
+                function(position) {
+                    if (position > -1) {
+                        console.log('AUDIO MEDIA POSITION :' + Math.round(position));
+                        audioMedia.seekTo((Math.round(position) + 3)*1000);
+                        setAudioPosition(Math.round(position) + 3);
+                        if (duration <= 0) {
+                            duration = audioMedia.getDuration();
+                            if (duration > 0) {
+                                duration = Math.round(duration);
+                                $("#mediaDuration").html(duration);
+                            }
+                        }
+                    }
+                },
+                function(error) {
+                    console.log("Error getting position=" + error);
+                    setAudioPosition("Error: " + error);
+                }
+            );            
+        }
+    }
 
     function pauseAudio() {
         if (is_paused) return;
@@ -185,9 +219,9 @@ function PlayerController($scope, $http, Record, Data) {
     }
 
     function stopAudio() {
-        if (audioMedia) {
+        if (audioMedia) {            
+            audioMedia.release(); //let free resources !important
             audioMedia.stop();
-            //audioMedia.release(); //TODO
             audioMedia = null;
         }
         if (audioTimer) {
