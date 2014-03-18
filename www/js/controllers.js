@@ -99,7 +99,9 @@ function PlayerController($scope, $http, Record, Data) {
             '/sdcard/'+recordURI,
             SERVER_ADDRESS+'/records', // Remote server for uploading record
             fileUploaded,
-            onError,
+            function(error){
+                alert('code: ' + error.code + '\n' + 'message: ' + error.source||error.message||error.target + '\n');
+            },
             options
         );        
     }
@@ -111,7 +113,7 @@ function PlayerController($scope, $http, Record, Data) {
         mediaStatus;
         
     $("#playAudio").bind('touchstart', function() {
-        stopAudio();
+        //stopAudio();
         if($scope.isLocal){
             var srcLocal = '/sdcard/touba_voice/'+$scope.record.fileName||$scope.record.name;        
             playAudio(srcLocal); 
@@ -120,18 +122,6 @@ function PlayerController($scope, $http, Record, Data) {
             playAudio(srcRemote);
         }              
     });        
-        
-    /*$("#playLocalAudio").bind('touchstart', function() {
-        stopAudio();
-        var srcLocal = '/sdcard/touba_voice/'+$scope.record.fileName||$scope.record.name;        
-        playAudio(srcLocal);               
-    });
-    
-    $("#playRemoteAudio").bind('touchstart', function() {
-        stopAudio();
-        var srcRemote = SERVER_ADDRESS+'/'+$scope.record.fileName||$scope.record.name;        
-        playAudio(srcRemote);
-    });*/
     
     $("#pauseaudio").bind('touchstart', function() {
         pauseAudio();
@@ -142,7 +132,11 @@ function PlayerController($scope, $http, Record, Data) {
     });
     
     $("#fastForwardAudio").bind('touchstart', function() {
-        forwardAudio();
+        seekAudioTo(3);
+    });
+    
+    $("#fastBackwardAudio").bind('touchstart', function() {
+        seekAudioTo(-3);
     });
 
     function playAudio(src) {
@@ -158,6 +152,9 @@ function PlayerController($scope, $http, Record, Data) {
             if (is_paused) {
                 is_paused = false;
                 audioMedia.play();
+            }else{
+                is_paused = true;
+                audioMedia.pause();
             }
         }
         if (audioTimer === null) {
@@ -184,15 +181,22 @@ function PlayerController($scope, $http, Record, Data) {
         }
     }
     
-    function forwardAudio(){
-        console.log('AUDIO MEDIA OBJECT:' + audioMedia);
+    function seekAudioTo(second){
+        if (second==null||second==='undefined') {
+            second=1;
+        }
+        //console.log('AUDIO MEDIA OBJECT:' + audioMedia);
         if (audioMedia!=null && mediaStatus== 2) {            
             audioMedia.getCurrentPosition(
                 function(position) {
                     if (position > -1) {
                         console.log('AUDIO MEDIA POSITION :' + Math.round(position));
-                        audioMedia.seekTo((Math.round(position) + 3)*1000);
-                        setAudioPosition(Math.round(position) + 3);
+                        newPosition = Math.round(position) + second;
+                        if(newPosition>=audioMedia.getDuration()||newPosition<=0){
+                            newPosition= Math.round(position);
+                        }
+                        audioMedia.seekTo(newPosition*1000);
+                        setAudioPosition(newPosition);
                         if (duration <= 0) {
                             duration = audioMedia.getDuration();
                             if (duration > 0) {
@@ -209,6 +213,10 @@ function PlayerController($scope, $http, Record, Data) {
             );            
         }
     }
+    
+    function backwardAudio() {
+        
+    }
 
     function pauseAudio() {
         if (is_paused) return;
@@ -221,7 +229,7 @@ function PlayerController($scope, $http, Record, Data) {
     function stopAudio() {
         if (audioMedia) {            
             audioMedia.release(); //let free resources !important
-            audioMedia.stop();
+            //audioMedia.stop();
             audioMedia = null;
         }
         if (audioTimer) {
